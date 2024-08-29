@@ -14,35 +14,18 @@
    
 3. Install the required packages
    ```
-   pip3 install torch torchtext spacy pdfminer
+   pip install openai azure-cognitiveservices-vision-computervision pillow pymupdf
    ```
-
-4. Download the spaCy model
+4. Create a config.ini
+   In the `src/` directory, create a `config.ini` in order to configure the keys, models, and api of Azure to use.
+   Those information should NEVER be stored in git. 
+   The file should have the following content:
    ```
-   python3 -m spacy download en_core_web_lg
+   [openai]
+   key = your_api_key
+   endpoint = your_azure_openai_endpoint
+   deployment_name = your_deployment_name
+   api_version = your_api_version
    ```
 
 Please note that every time you want to run the project you need to activate the virtual environment. 
-
-## Azure Cognitive
-
-Install required libraries
-```
-pip install openai azure-cognitiveservices-vision-computervision pillow pymupdf
-```
-
-## Azure Storage
-Install required libraries
-```
-pip install azure-storage-blob
-```
-
-## Phi-3-vision with LLaMA
-
-```
-pip install accelerate flash-attn transformers pytorch torchvision pytesseract bitsandbytes pillow
-```
-
-```
-brew install tesseract
-```
