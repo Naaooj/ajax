@@ -18,7 +18,6 @@
    ```
 4. Create a config.ini
    In the `src/` directory, create a `config.ini` in order to configure the keys, models, and api of Azure to use.
-   Those information should NEVER be stored in git. 
    The file should have the following content:
    ```
    [openai]
@@ -27,5 +26,14 @@
    deployment_name = your_deployment_name
    api_version = your_api_version
    ```
+   Those information should NEVER be stored in git. 
+5. Create a folder `resumes`
+   ```
+   resumes/
+   ├─hired
+   ├─rejected
+   ```
+   And put PDF files of valid or unvalid resumes accordingly
+   This folder should NEVER be stored in git.
 
 Please note that every time you want to run the project you need to activate the virtual environment. 
