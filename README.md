@@ -14,7 +14,7 @@
    
 3. Install the required packages
    ```
-   pip install openai azure-cognitiveservices-vision-computervision pillow pymupdf
+   pip install openai azure-cognitiveservices-vision-computervision pillow pymupdf fitz image
    ```
 4. Create a config.ini
    In the `src/` directory, create a `config.ini` in order to configure the keys, models, and api of Azure to use.
