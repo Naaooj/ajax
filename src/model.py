@@ -8,29 +8,30 @@ class Model():
         self.dataset = dataset
         self.data_loader = data_loader
         self.num_epochs = num_epochs
+        self.model = BertForSequenceClassification.from_pretrained('bert-base-uncased', num_labels=2)
 
-    def train_model(self, model, dataloader):
+    def train_model(self):
         device = torch.device('cpu')
 
-        model.to(device)
+        self.model.to(device)
 
-        optimizer = AdamW(model.parameters(), lr=2e-5, correct_bias=False)
-        total_steps = len(dataloader) * self.num_epochs  
+        optimizer = AdamW(self.model.parameters(), lr=2e-5, correct_bias=False)
+        total_steps = len(self.dataloader) * self.num_epochs  
 
         scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=0, num_training_steps=total_steps)
 
         for epoch in range(self.num_epochs):
-            model.train()
+            self.model.train()
             total_loss = 0
 
-            for batch in dataloader:
+            for batch in self.dataloader:
                 input_ids = batch['input_ids'].to(device)
                 attention_mask = batch['attention_mask'].to(device)
                 labels = batch['labels'].to(device)
 
-                model.zero_grad()
+                self.model.zero_grad()
 
-                outputs = model(input_ids=input_ids, attention_mask=attention_mask, labels=labels)
+                outputs = self.model(input_ids=input_ids, attention_mask=attention_mask, labels=labels)
                 loss = outputs.loss
                 total_loss += loss.item()
 
@@ -38,7 +39,7 @@ class Model():
                 optimizer.step()
                 scheduler.step()
 
-            avg_train_loss = total_loss / len(dataloader)
+            avg_train_loss = total_loss / len(self.dataloader)
             print(f'Epoch {epoch + 1}/{self.num_epochs}, Loss: {avg_train_loss:.4f}')
 
     def evaluate(model, dataloader):
