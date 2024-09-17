@@ -27,7 +27,14 @@ def convert_pdf(pdf_path, result_path, override):
 
     # Get the JSON response from the API (as requested in the prompt)
     json_response = response.choices[0].message.content
-    json_response = json.loads(json_response)
+
+    try:
+        response = azure_service.call_vision_api(images)
+        json_response = response.choices[0].message.content
+        json_response = json.loads(json_response)
+    except Exception as e:
+        print(f"Cannot analyze result in file '{output_file}'. IGNORED.")
+        return
 
     # Save the response to a JSON file
     write_json(json_response, output_file)
