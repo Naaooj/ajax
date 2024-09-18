@@ -48,6 +48,11 @@ class Model():
             avg_train_loss = total_loss / len(self.data_loader)
             print(f'Epoch {epoch + 1}/{self.num_epochs}, Loss: {avg_train_loss:.4f}')
 
+    def save(self, path):
+        # Save the trained model to the given path
+        self.model.save_pretrained(save_directory=path, state_dict=self.model.state_dict())
+        print(f'Model saved to {path}')
+
     def evaluate(self, dataloader):
         print('Evaluating model...')
 
