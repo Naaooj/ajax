@@ -20,13 +20,22 @@ class JsonUtils:
         mother_tongue = content.get('motherTongue', '')
 
         # Extract diplomas
-        diplomas = ', '.join([f"{d['level']} ({d['year']})" for d in content.get('diplomas', [])])
+        diplomas_list = content.get('diplomas', [])
+        if diplomas_list is None:
+            diplomas_list = []
+        diplomas = ', '.join([f"{d['level']} ({d['year']})" for d in diplomas_list])
 
         # Extract languages
-        languages = ', '.join([f"{l['language']} ({l['proficiency']})" for l in content.get('otherLanguages', []) if l['proficiency']])
+        languages_list = content.get('otherLanguages', [])
+        if languages_list is None:
+            languages_list = []
+        languages = ', '.join([f"{l['language']} ({l.get('proficiency')})" for l in languages_list if l and l.get('proficiency')])
 
         # Extract technologies
-        technologies = ', '.join([f"{t['name']} ({t['yearsOfExperience']} years)" for t in content.get('technologies', [])])
+        technologies_list = content.get('technologies', [])
+        if technologies_list is None:
+            technologies_list = []
+        technologies = ', '.join([f"{t['name']} ({t['yearsOfExperience']} years)" for t in technologies_list if t])
 
         return f"{firstname} {lastname} {nationality} {address} {email} {phone} {sex} {experience} years of experience {studies} years of studies {mother_tongue} {diplomas} {languages} {technologies}"
         

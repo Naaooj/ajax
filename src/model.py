@@ -1,5 +1,5 @@
-from torch.utils.data import DataLoader
-from transformers import AdamW, BertForSequenceClassification, BertTokenizer, get_linear_schedule_with_warmup
+from tqdm import tqdm
+from transformers import BertForSequenceClassification, get_linear_schedule_with_warmup
 
 import torch
 
@@ -9,14 +9,15 @@ class Model():
         self.data_loader = data_loader
         self.num_epochs = num_epochs
         self.model = BertForSequenceClassification.from_pretrained('bert-base-uncased', num_labels=2)
+        self.device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
     def train_model(self):
-        device = torch.device('cpu')
+        print('Training model...')
 
-        self.model.to(device)
+        self.model.to(self.device)
 
-        optimizer = AdamW(self.model.parameters(), lr=2e-5, correct_bias=False)
-        total_steps = len(self.dataloader) * self.num_epochs  
+        optimizer = torch.optim.AdamW(self.model.parameters(), lr=2e-5)
+        total_steps = len(self.data_loader) * self.num_epochs  
 
         scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=0, num_training_steps=total_steps)
 
@@ -24,10 +25,12 @@ class Model():
             self.model.train()
             total_loss = 0
 
-            for batch in self.dataloader:
-                input_ids = batch['input_ids'].to(device)
-                attention_mask = batch['attention_mask'].to(device)
-                labels = batch['labels'].to(device)
+            progress_bar = tqdm(self.data_loader, desc=f'Epoch {epoch + 1}/{self.num_epochs}', leave=False)
+
+            for batch in progress_bar:
+                input_ids = batch['input_ids'].to(self.device)
+                attention_mask = batch['attention_mask'].to(self.device)
+                labels = batch['labels'].to(self.device)
 
                 self.model.zero_grad()
 
@@ -39,23 +42,26 @@ class Model():
                 optimizer.step()
                 scheduler.step()
 
-            avg_train_loss = total_loss / len(self.dataloader)
+                # Update the progress bar with the current loss
+                progress_bar.set_postfix(loss=loss.item())
+
+            avg_train_loss = total_loss / len(self.data_loader)
             print(f'Epoch {epoch + 1}/{self.num_epochs}, Loss: {avg_train_loss:.4f}')
 
-    def evaluate(model, dataloader):
-        device = torch.device('cpu')
+    def evaluate(self, dataloader):
+        print('Evaluating model...')
 
-        model.eval()
+        self.model.eval()
         total_loss = 0
         correct_predictions = 0
 
         with torch.no_grad():
             for batch in dataloader:
-                input_ids = batch['input_ids'].to(device)
-                attention_mask = batch['attention_mask'].to(device)
-                labels = batch['labels'].to(device)
+                input_ids = batch['input_ids'].to(self.device)
+                attention_mask = batch['attention_mask'].to(self.device)
+                labels = batch['labels'].to(self.device)
 
-                outputs = model(input_ids=input_ids, attention_mask=attention_mask, labels=labels)
+                outputs = self.model(input_ids=input_ids, attention_mask=attention_mask, labels=labels)
                 loss = outputs.loss
                 total_loss += loss.item()
 
