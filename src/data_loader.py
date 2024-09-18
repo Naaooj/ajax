@@ -12,10 +12,10 @@ def convert_folders(override):
     convert_folder(rejected_folder_path, rejected_results_folder_path, override)
 
 def get_override_param():
-    user_input = input("Would you like to override existing files? (y/n): ").lower()
+    user_input = input("Would you like to override existing files? (y/N): ").lower()
     if user_input == "y":
         return True
-    elif user_input == "n":
+    elif user_input == "n" or user_input == "N" or user_input == "":
         return False
     else:
         print("Invalid input. Please try again.")

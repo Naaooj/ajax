@@ -9,16 +9,14 @@ from pdf_reader import PDFReader
 def convert_pdf(pdf_path, result_path, override):
     output_file = get_result_file(pdf_path, result_path)
     if override is False and os.path.exists(output_file):
-        print(f"File '{pdf_path}' already converted and will be ignored.")
+        print("Already converted and will be ignored.")
         return
-    else:
-        print(f"Start converting file '{pdf_path}'")
 
     # Create the PDFReader object, and get the images
     pdf_reader = PDFReader(pdf_path)
     images = pdf_reader.get_images()
     if len(images) > 10:
-        print(f"File '{pdf_path}' has more than 10 pages. Only the first 10 pages will be converted.")
+        print("CV has more than 10 pages. Only the first 10 pages will be converted.")
         images = images[:10]
 
     # Create the AzureService object and call the Vision API
@@ -33,12 +31,13 @@ def convert_pdf(pdf_path, result_path, override):
         json_response = response.choices[0].message.content
         json_response = json.loads(json_response)
     except Exception as e:
-        print(f"Cannot analyze result in file '{output_file}'. IGNORED.")
+        print("Cannot get JSON. IGNORED. File is removed.")
+        os.remove(pdf_path)
         return
 
     # Save the response to a JSON file
     write_json(json_response, output_file)
-    print(f"Saved result in file '{output_file}'. Waiting 60s before next conversion.")
+    print(f"Result saved in file '{output_file}'. Waiting 60s before next conversion.")
     time.sleep(60)
 
 
@@ -57,12 +56,14 @@ def get_result_file(pdf_path, result_path):
 
 def convert_folder(pdf_folder, result_folder, override):
     print(f"Start converting folder '{pdf_folder}'")
+    index = 0
     for root, _, files in os.walk(pdf_folder):
+        total = len(files)
         for file in files:
+            index += 1
+            print(f"Processing file {index}/{total}: {file}")
             if file.endswith('.pdf'):
-                pdf_path = os.path.join(root, file)
-                convert_pdf(pdf_path, result_folder, override)
+                convert_pdf(os.path.join(root, file), result_folder, override)
             else:
-                pdf_path = os.path.join(root, file)
-                print(f"File '{pdf_path}' is not a PDF")
+                print("CV is not in a PDF format")
     print(f"Folder '{pdf_folder}' has been converted")
