@@ -1,15 +1,22 @@
+import matplotlib.pyplot as plt
+from sklearn.metrics import precision_score, recall_score, f1_score
 from tqdm import tqdm
 from transformers import BertForSequenceClassification, get_linear_schedule_with_warmup
 
+import os
 import torch
 
 class Model():
-    def __init__(self, dataset, data_loader, num_epochs=5):
+    def __init__(self, dataset, data_loader, models_dir, num_epochs=5):
         self.dataset = dataset
         self.data_loader = data_loader
         self.num_epochs = num_epochs
         self.model = BertForSequenceClassification.from_pretrained('bert-base-uncased', num_labels=2)
         self.device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+
+        # Ensure the directory exists
+        os.makedirs(models_dir, exist_ok=True)
+        self.models_dir = models_dir
 
     def train_model(self):
         print('Training model...')
@@ -20,6 +27,13 @@ class Model():
         total_steps = len(self.data_loader) * self.num_epochs  
 
         scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=0, num_training_steps=total_steps)
+
+        # List to store the average training loss for each epoch
+        training_losses = []
+        validation_losses = []
+
+        best_val_loss = float('inf')
+        epochs_no_improve = 0
 
         for epoch in range(self.num_epochs):
             self.model.train()
@@ -45,13 +59,46 @@ class Model():
                 # Update the progress bar with the current loss
                 progress_bar.set_postfix(loss=loss.item())
 
-            avg_train_loss = total_loss / len(self.data_loader)
+            avg_train_loss = total_loss / len(self.train_loader)
+            training_losses.append(avg_train_loss)
             print(f'Epoch {epoch + 1}/{self.num_epochs}, Loss: {avg_train_loss:.4f}')
 
-    def save(self, path):
+            # Evaluate the model on the validation set
+            val_loss, val_accuracy, val_precision, val_recall, val_f1 = self.evaluate(self.val_loader)
+            validation_losses.append(val_loss)
+            print(f'Validation Loss: {val_loss:.4f}, Validation Accuracy: {val_accuracy:.4f}')
+            print(f'Precision: {val_precision:.4f}, Recall: {val_recall:.4f}, F1 Score: {val_f1:.4f}')
+
+            # Check for early stopping
+            if val_loss < best_val_loss:
+                best_val_loss = val_loss
+                epochs_no_improve = 0
+            else:
+                epochs_no_improve += 1
+
+            if epochs_no_improve >= self.patience:
+                print('Early stopping triggered')
+                break
+        
+        # Plot the training and validation loss
+        plt.figure(figsize=(10, 5))
+        plt.plot(range(1, len(training_losses) + 1), training_losses, marker='o', label='Training Loss')
+        plt.plot(range(1, len(validation_losses) + 1), validation_losses, marker='o', label='Validation Loss')
+        plt.xlabel('Epoch')
+        plt.ylabel('Loss')
+        plt.title('Training and Validation Loss Over Epochs')
+        plt.legend()
+        plt.grid()
+
+        # Save the plot as an image file
+        plot_path = os.path.join(self.models_dir, 'training_validation_loss.png')
+        plt.savefig(plot_path)
+        print(f'Plot saved to {plot_path}')
+
+    def save(self):
         # Save the trained model to the given path
-        self.model.save_pretrained(save_directory=path, state_dict=self.model.state_dict())
-        print(f'Model saved to {path}')
+        self.model.save_pretrained(save_directory=self.models_dir, state_dict=self.model.state_dict())
+        print(f'Model saved to {self.models_dir}')
 
     def evaluate(self, dataloader):
         print('Evaluating model...')
@@ -59,6 +106,8 @@ class Model():
         self.model.eval()
         total_loss = 0
         correct_predictions = 0
+        all_labels = []
+        all_preds = []
 
         with torch.no_grad():
             for batch in dataloader:
@@ -74,7 +123,13 @@ class Model():
                 _, preds = torch.max(logits, dim=1)
                 correct_predictions += torch.sum(preds == labels)
 
+                all_labels.extend(labels.cpu().numpy())
+                all_preds.extend(preds.cpu().numpy())
+
         avg_loss = total_loss / len(dataloader)
         accuracy = correct_predictions.double() / len(dataloader.dataset)
+        precision = precision_score(all_labels, all_preds, average='weighted')
+        recall = recall_score(all_labels, all_preds, average='weighted')
+        f1 = f1_score(all_labels, all_preds, average='weighted')
 
-        return avg_loss, accuracy
+        return avg_loss, accuracy, precision, recall, f1

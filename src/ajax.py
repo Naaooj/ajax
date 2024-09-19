@@ -13,22 +13,16 @@ def main():
     dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
 
     # Train the model
-    model = Model(dataset, dataloader)
+    models_dir = os.path.join(os.getcwd(), 'models')
+    model = Model(dataset, dataloader, models_dir)
     model.train_model()
 
     # Evaluate the model
     loss, accuracy = model.evaluate(dataloader)
-    print(f'Validation Loss: {loss:.4f}, Validation Accuracy: {accuracy:.4f}')
-
-    # Create a file in the given directory to save the model
-    # Construct the directory path
-    models_dir = os.path.join(os.getcwd(), 'models')
-
-    # Ensure the directory exists
-    os.makedirs(models_dir, exist_ok=True)
+    print(f'Validation Loss: {loss:.4f}, Validation Accuracy: {accuracy:.4f}') 
 
     # Save the model
-    model.save(models_dir)
+    model.save()
 
 if __name__ == '__main__':
     main()
