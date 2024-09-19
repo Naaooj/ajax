@@ -5,16 +5,10 @@ SYSTEM_PROMPT = """
 USER_PROMPT = """
     Extract the data in this resume, grouping data according to theme/sub groups, and then output into JSON.
     If there are blank data fields in the resume, please include them as "null" or "false" (if it's a boolean) values in the JSON object.
-    Keep only 15 technologies, order them by years of experience descending
+    Keep only 20 technologies, order them by years of experience descending
     Use the following structure:
     {
-        "firstname": "",
-        "lastname": "",
         "hasEuropeanNationality": true,
-        "address": "",
-        "email": "",
-        "phoneNumber": "",
-        "sex": "",
         "totalYearsOfExperience": 0.0,
         "totalYearsOfStudies": 0.0,
         "diplomas": [{
