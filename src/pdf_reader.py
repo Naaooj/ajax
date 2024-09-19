@@ -4,31 +4,39 @@ from PIL import Image
 import base64
 import fitz
 
-'''
-The PDFReader class is responsible for reading a PDF file and converting it to a list of base64 images, each representing a page in the PDF.
-'''
 class PDFReader():
-    '''
-    Instantiate the PDFReader class, storing the PDF file path and initializing an empty list of images.
-    '''
+    """
+    The PDFReader class is responsible for reading a PDF file and converting it to a list of base64 images, each representing a page in the PDF.
+    """
+    
     def __init__(self, pdf_path):
+        """
+        Instantiate the PDFReader class, storing the PDF file path and initializing an empty list of images.
+
+        Parameters:
+            pdf_path: The path to the PDF file
+        """
         self.__pdf_path = pdf_path
         self.__images = None
 
-    '''
-    Get the list of base64 images
-    :return: The list of base64 images
-    '''
     def get_images(self):
+        """
+        Get the list of base64 images
+    
+        Returns:
+            The list of base64 images
+        """
         if (self.__images is None):
             self.__read_pdf()
         return self.__images
     
-    '''
-    Read the PDF file and convert each page to a base64 image, storing it in the images
-    :return: The list of base64 images
-    '''
     def __read_pdf(self):
+        """
+        Read the PDF file and convert each page to a base64 image, storing it in the images
+        
+        Returns: 
+            The list of base64 images
+        """
         # Initialize the list of images
         self.__images = []
 

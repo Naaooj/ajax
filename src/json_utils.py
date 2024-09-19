@@ -8,13 +8,7 @@ class JsonUtils:
             content = json.load(file)
 
         # Extract basic information
-        # firstname = content.get('firstname', '')
-        # lastname = content.get('lastname', '')
         nationality = 'European' if content.get('hasEuropeanNationality', False) else 'Non-European'
-        # address = content.get('address', '')
-        # email = content.get('email', '')
-        # phone = content.get('phoneNumber', '')
-        #sex = content.get('sex', '')
         experience = content.get('totalYearsOfExperience', 0.0)
         studies = content.get('totalYearsOfStudies', 0.0)
         mother_tongue = content.get('motherTongue', '')
@@ -37,6 +31,5 @@ class JsonUtils:
             technologies_list = []
         technologies = ', '.join([f"{t['name']} ({t['yearsOfExperience']} years)" for t in technologies_list if t])
 
-        #return f"{firstname} {lastname} {nationality} {address} {email} {phone} {sex} {experience} years of experience {studies} years of studies {mother_tongue} {diplomas} {languages} {technologies}"
         return f"{nationality} {experience} years of experience {studies} years of studies {mother_tongue} {diplomas} {languages} {technologies}"
         

@@ -27,11 +27,8 @@ def main():
     # Ensure the directory exists
     os.makedirs(models_dir, exist_ok=True)
 
-    # Construct the file path
-    model_path = os.path.join(models_dir, 'ajax.pt')
-
     # Save the model
-    model.save(model_path)
+    model.save(models_dir)
 
 if __name__ == '__main__':
     main()
