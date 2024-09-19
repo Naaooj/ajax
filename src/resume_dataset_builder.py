@@ -24,6 +24,8 @@ class ResumeDatasetBuilder():
         texts.extend(rejected_texts)
         labels.extend(rejected_labels)
 
+        print(f"Loaded {len(texts)} resumes ({len(hired_texts)} hired and {len(rejected_texts)}) for dataset")
+
         dataset = ResumeDataset(texts, labels, self.tokenizer, self.max_length)
     
         return dataset
