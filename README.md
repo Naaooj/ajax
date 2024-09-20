@@ -14,7 +14,7 @@
    
 3. Install the required packages
    ```
-   pip install torch openai azure-cognitiveservices-vision-computervision pillow fitz image tqdm scikit-learn matplotlib
+   pip install torch openai azure-cognitiveservices-vision-computervision transformers pillow fitz image tqdm scikit-learn matplotlib
    ```
 4. Create a config.ini
    In the `src/` directory, create a `config.ini` in order to configure the keys, models, and api of Azure to use.

@@ -7,10 +7,11 @@ import os
 import torch
 
 class Model():
-    def __init__(self, dataset, data_loader, models_dir, num_epochs=5):
-        self.dataset = dataset
-        self.data_loader = data_loader
+    def __init__(self, train_data_loader, validation_data_loader, models_dir, num_epochs=5, patience=3):
+        self.train_data_loader = train_data_loader
+        self.validation_data_loader = validation_data_loader
         self.num_epochs = num_epochs
+        self.patience = patience
         self.model = BertForSequenceClassification.from_pretrained('bert-base-uncased', num_labels=2)
         self.device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
@@ -24,7 +25,7 @@ class Model():
         self.model.to(self.device)
 
         optimizer = torch.optim.AdamW(self.model.parameters(), lr=2e-5)
-        total_steps = len(self.data_loader) * self.num_epochs  
+        total_steps = len(self.train_data_loader) * self.num_epochs  
 
         scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=0, num_training_steps=total_steps)
 
@@ -39,7 +40,7 @@ class Model():
             self.model.train()
             total_loss = 0
 
-            progress_bar = tqdm(self.data_loader, desc=f'Epoch {epoch + 1}/{self.num_epochs}', leave=False)
+            progress_bar = tqdm(self.train_data_loader, desc=f'Epoch {epoch + 1}/{self.num_epochs}', leave=False)
 
             for batch in progress_bar:
                 input_ids = batch['input_ids'].to(self.device)
@@ -59,12 +60,12 @@ class Model():
                 # Update the progress bar with the current loss
                 progress_bar.set_postfix(loss=loss.item())
 
-            avg_train_loss = total_loss / len(self.train_loader)
+            avg_train_loss = total_loss / len(self.train_data_loader)
             training_losses.append(avg_train_loss)
             print(f'Epoch {epoch + 1}/{self.num_epochs}, Loss: {avg_train_loss:.4f}')
 
             # Evaluate the model on the validation set
-            val_loss, val_accuracy, val_precision, val_recall, val_f1 = self.evaluate(self.val_loader)
+            val_loss, val_accuracy, val_precision, val_recall, val_f1 = self.evaluate(self.validation_data_loader)
             validation_losses.append(val_loss)
             print(f'Validation Loss: {val_loss:.4f}, Validation Accuracy: {val_accuracy:.4f}')
             print(f'Precision: {val_precision:.4f}, Recall: {val_recall:.4f}, F1 Score: {val_f1:.4f}')
