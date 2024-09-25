@@ -14,24 +14,17 @@ def main():
     validation_size = len(dataset) - train_size
     train_dataset, validation_dataset = random_split(dataset, [train_size, validation_size])
 
-    batch_size = 2
-    train_data_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
-    validation_data_loader = DataLoader(validation_dataset, batch_size=batch_size, shuffle=False)
+    train_batch_size = 16
+    validation_batch_size = 8
+    train_data_loader = DataLoader(train_dataset, batch_size=train_batch_size, shuffle=True)
+    validation_data_loader = DataLoader(validation_dataset, batch_size=validation_batch_size, shuffle=False)
     
     # Define the directory to save the models    
     models_dir = os.path.join(os.getcwd(), 'models')
 
     # Train the model
-    model = Model(train_data_loader, validation_data_loader, models_dir)
+    model = Model(train_data_loader, validation_data_loader, models_dir, num_epochs=6, learning_rate=1e-5, weight_decay=1e-3, patience=3)
     model.train_model()
-
-    # Evaluate the model
-    loss, accuracy, precision, recall, f1 = model.evaluate(validation_data_loader)
-    print(f'Validation Loss: {loss:.4f}, Validation Accuracy: {accuracy:.4f}')
-    print(f'Precision: {precision:.4f}, Recall: {recall:.4f}, F1 Score: {f1:.4f}')
-
-    # Save the model
-    model.save()
 
 if __name__ == '__main__':
     main()
