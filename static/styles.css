@@ -1,0 +1,76 @@
+/* static/styles.css */
+body {
+    background-color: lightgray;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    height: 100vh; : Définit la hauteur du corps à 100% de la hauteur de la fenêtre.
+}
+
+.container {
+    width: 100%;
+    max-width: 2000px; /* Limite la largeur maximale du conteneur */
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden; /* Assure que le contenu ne déborde pas */
+    height: 100%;
+}
+
+.banner > img {
+    width: 100%;
+    max-width: 2000px; /* Limite la largeur maximale de l'image */
+
+}
+
+.banner {
+    height: 150px;
+    background-image: var(--banner-url);
+    background-position: bottom right;
+    background-repeat: no-repeat; /* Prevents the image from repeating */
+    background-size: cover; /* Ensures the image covers the entire element */
+    align-items: center;
+    padding-top: 70px;
+}
+
+.content {
+    padding: 100px;
+    background-color: white;
+}
+
+h1 {
+    color: white;
+    font-size: 40px;
+}
+
+h3 {
+    color: blue;
+}
+
+.file-input {
+    display: none;
+}
+
+.file-label {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 20px;
+}
+
+button {
+    background-color: green;
+    color: black;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 10px;
+}
+button:disabled {
+    background-color: lightgray;
+ }
