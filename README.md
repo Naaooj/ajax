@@ -43,3 +43,6 @@ sudo apt-get install -y build-essential libssl-dev libffi-dev python3-dev
    This folder should NEVER be stored in git.
 
 Please note that every time you want to run the project you need to activate the virtual environment. 
+
+## Links
+* https://iamirmasoud.com/2022/06/19/understanding-micro-macro-and-weighted-averages-for-scikit-learn-metrics-in-multi-class-classification-with-example/
