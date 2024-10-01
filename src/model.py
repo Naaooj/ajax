@@ -1,6 +1,6 @@
 from sklearn.metrics import precision_score, recall_score, f1_score
 from tqdm import tqdm
-from transformers import BertForSequenceClassification, get_linear_schedule_with_warmup
+from transformers import RobertaForSequenceClassification, get_linear_schedule_with_warmup
 
 import datetime
 import matplotlib.pyplot as plt
@@ -19,13 +19,13 @@ class Model():
         self.weight_decay = weight_decay
         self.patience = patience
         self.seed = seed
-        self.model = BertForSequenceClassification.from_pretrained('bert-large-uncased', num_labels=2)
+        self.model = RobertaForSequenceClassification.from_pretrained('roberta-large', num_labels=2)
 
         if torch.cuda.is_available():
-            print('model will be trained using GPU')
+            print('Model will be trained using GPU')
             self.device = torch.device('cuda')
         else:
-            print('model will be trained using CPU')
+            print('Model will be trained using CPU')
             self.device = torch.device('cpu')
 
         # Ensure the output directory exists
@@ -40,7 +40,7 @@ class Model():
 
         self.model.to(self.device)
 
-        optimizer = torch.optim.AdamW(self.model.parameters(), lr=self.learning_rate, weight_decay=self.weight_decay)
+        optimizer = torch.optim.SGD(self.model.parameters(), lr=self.learning_rate, momentum=0.9)
         total_steps = len(self.train_data_loader) * self.num_epochs  
 
         scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=0, num_training_steps=total_steps)
@@ -90,7 +90,8 @@ class Model():
                 # Get the predicted labels (a tensor containing the raw, unnormalized scores output by the final layer of the neural network for each class: hired or rejected)
                 logits = outputs.logits
                 _, preds = torch.max(logits, dim=1)
-                correct_predictions += torch.sum(preds == labels)
+                #correct_predictions += torch.sum(preds == labels)
+                correct_predictions += logits.argmax(dim=1).eq(labels).sum().item()
 
                 all_labels.extend(labels.cpu().numpy())
                 all_preds.extend(preds.cpu().numpy())
@@ -108,8 +109,10 @@ class Model():
             avg_train_loss = total_loss / len(self.train_data_loader)
             training_losses.append(avg_train_loss)
 
-            accuracy = correct_predictions.double() / len(self.train_data_loader.dataset)
-            training_accuracies.append(accuracy.cpu().numpy())
+            #accuracy = correct_predictions.double() / len(self.train_data_loader.dataset)
+            accuracy = correct_predictions / len(self.train_data_loader.dataset)
+            #training_accuracies.append(accuracy.cpu().numpy())
+            training_accuracies.append(accuracy)
 
             precision = precision_score(all_labels, all_preds, average='weighted', zero_division=0)
             training_precisions.append(precision)
