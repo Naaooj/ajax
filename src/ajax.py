@@ -5,9 +5,10 @@ from transformers import AutoTokenizer
 
 import os
 
+
 def main():
     tokenizer = AutoTokenizer.from_pretrained('roberta-large')
-    dataset = ResumeDatasetBuilder(tokenizer, max_length=256).buildDataset()
+    dataset = ResumeDatasetBuilder(tokenizer, max_length=256).build_dataset()
 
     # Split the dataset into training and validation sets
     train_size = int(0.8 * len(dataset))
@@ -25,6 +26,7 @@ def main():
     # Train the model
     model = Model(train_data_loader, validation_data_loader, models_dir, num_epochs=6, learning_rate=1e-5, weight_decay=1e-3, patience=3)
     model.train_model()
+
 
 if __name__ == '__main__':
     main()

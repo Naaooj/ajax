@@ -1,16 +1,19 @@
-from json_utils import JsonUtils
 from resume_dataset import ResumeDataset
 
 import os
 
-class ResumeDatasetBuilder():
+from src.common.json_utils import JsonUtils
+
+
+class ResumeDatasetBuilder:
+
     def __init__(self, tokenizer, max_length=512):
         self.tokenizer = tokenizer
         self.max_length = max_length
         self.hired_results_folder_path = os.path.join(os.getcwd(), 'resumes/results/hired/')
         self.rejected_results_folder_path = os.path.join(os.getcwd(), 'resumes/results/rejected/')
 
-    def buildDataset(self):
+    def build_dataset(self):
         texts = []
         labels = []
 

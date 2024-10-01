@@ -1,7 +1,9 @@
 import torch
 from torch.utils.data import Dataset
 
+
 class ResumeDataset(Dataset):
+
     def __init__(self, texts, labels, tokenizer, max_length):
         self.texts = texts
         self.labels = labels

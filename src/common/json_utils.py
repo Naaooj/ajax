@@ -1,5 +1,6 @@
 import json
 
+
 class JsonUtils:
 
     @staticmethod
@@ -32,4 +33,3 @@ class JsonUtils:
         technologies = ', '.join([f"{t['name']} ({t['yearsOfExperience']} years)" for t in technologies_list if t])
 
         return f"{nationality} {experience} years of experience {studies} years of studies {mother_tongue} {diplomas} {languages} {technologies}"
-        

@@ -1,5 +1,7 @@
 import os
-from json_utils import JsonUtils
+
+from src.common.json_utils import JsonUtils
+
 
 def analyze_text_lengths(folder):
     lengths = []

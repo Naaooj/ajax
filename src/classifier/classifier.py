@@ -2,15 +2,14 @@ import os
 import torch
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
-from src.json_utils import JsonUtils
-
 
 class ModelClassifier:
-    def __init__(self, model_dir, max_length):
+
+    def __init__(self):
         # Use a pre-trained tokenizer that matches your model type
-        self.tokenizer = AutoTokenizer.from_pretrained('bert-base-uncased')
-        self.model = AutoModelForSequenceClassification.from_pretrained(model_dir)
-        self.max_length = max_length
+        self.tokenizer = AutoTokenizer.from_pretrained('roberta-large')
+        self.model = AutoModelForSequenceClassification.from_pretrained(os.path.join(os.getcwd(), 'models/'))
+        self.max_length = 128
         self.model.eval()
 
     def classify(self, text):
@@ -38,20 +37,20 @@ class ModelClassifier:
         return predicted_class.item()
 
 
-def classify_folder(folder):
-    for root, _, files in os.walk(folder):
-        total = len(files)
-        hired = 0
-        for file in files:
-            text = JsonUtils.flatten(os.path.join(root, file))
-            predicted_class = classifier.classify(text)
-            hired += predicted_class
-        print(f'Folder "{folder}" Hired: {hired}/{total}')
-
-
-if __name__ == '__main__':
-    model_dir = os.path.join(os.getcwd(), 'models/')
-    max_length = 128
-    classifier = ModelClassifier(model_dir, max_length)
-    classify_folder(os.path.join(os.getcwd(), 'resumes/results/hired/'))
-    classify_folder(os.path.join(os.getcwd(), 'resumes/results/rejected/'))
+# def classify_folder(folder):
+#     for root, _, files in os.walk(folder):
+#         total = len(files)
+#         hired = 0
+#         for file in files:
+#             text = JsonUtils.flatten(os.path.join(root, file))
+#             predicted_class = classifier.classify(text)
+#             hired += predicted_class
+#         print(f'Folder "{folder}" Hired: {hired}/{total}')
+#
+#
+# if __name__ == '__main__':
+#     model_dir = os.path.join(os.getcwd(), 'models/')
+#     max_length = 128
+#     classifier = ModelClassifier(model_dir, max_length)
+#     classify_folder(os.path.join(os.getcwd(), 'resumes/results/hired/'))
+#     classify_folder(os.path.join(os.getcwd(), 'resumes/results/rejected/'))
