@@ -1,12 +1,12 @@
 from model import Model
 from resume_dataset_builder import ResumeDatasetBuilder
 from torch.utils.data import DataLoader, random_split
-from transformers import BertTokenizer
+from transformers import AutoTokenizer
 
 import os
 
 def main():
-    tokenizer = BertTokenizer.from_pretrained('bert-large-uncased')
+    tokenizer = AutoTokenizer.from_pretrained('roberta-large')
     dataset = ResumeDatasetBuilder(tokenizer, max_length=256).buildDataset()
 
     # Split the dataset into training and validation sets
