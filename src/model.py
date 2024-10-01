@@ -35,9 +35,10 @@ class Model():
         # Calculate class weights
         class_counts = self.__get_class_distribution()
         total_samples = sum(class_counts)
-        class_weights = [total_samples / class_count for class_count in class_counts]
+        print(f'Class counts: {class_counts}, total samples: {total_samples}')
+        class_weights = [total_samples / (class_count * 2) for class_count in class_counts]
         self.class_weights = torch.tensor(class_weights, dtype=torch.float).to(self.device)
-        print(f'Class weights: {self.class_weights}')
+        print(f'Class weights: {class_weights}, tensor class weight: {self.class_weights}')
 
         # Set the seed for reproducibility
         self.__set_seed()
@@ -47,7 +48,7 @@ class Model():
 
         self.model.to(self.device)
 
-        optimizer = torch.optim.SGD(self.model.parameters(), lr=self.learning_rate, momentum=0.9)
+        optimizer = torch.optim.AdamW(self.model.parameters(), lr=self.learning_rate, weight_decay=self.weight_decay)
         total_steps = len(self.train_data_loader) * self.num_epochs  
 
         scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=0, num_training_steps=total_steps)
