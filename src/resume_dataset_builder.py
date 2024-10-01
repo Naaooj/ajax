@@ -1,9 +1,7 @@
 from resume_dataset import ResumeDataset
+from common.json_utils import JsonUtils
 
 import os
-
-from src.common.json_utils import JsonUtils
-
 
 class ResumeDatasetBuilder:
 
