@@ -1,5 +1,11 @@
 # AJAX
 
+## Configuring the VM
+```
+sudo apt-get update
+sudo apt-get install -y build-essential libssl-dev libffi-dev python3-dev
+```
+
 ## Getting started
 
 1. Create a virtual environment, this allows to manage dependencies for the project without affecting the system's python installation.

@@ -6,8 +6,8 @@ from transformers import BertTokenizer
 import os
 
 def main():
-    tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-    dataset = ResumeDatasetBuilder(tokenizer).buildDataset()
+    tokenizer = BertTokenizer.from_pretrained('bert-large-uncased')
+    dataset = ResumeDatasetBuilder(tokenizer, max_length=256).buildDataset()
 
     # Split the dataset into training and validation sets
     train_size = int(0.8 * len(dataset))
