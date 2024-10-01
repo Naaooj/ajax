@@ -32,6 +32,13 @@ class Model():
         os.makedirs(models_dir, exist_ok=True)
         self.models_dir = models_dir
 
+        # Calculate class weights
+        class_counts = self.__get_class_distribution()
+        total_samples = sum(class_counts)
+        class_weights = [total_samples / class_count for class_count in class_counts]
+        self.class_weights = torch.tensor(class_weights, dtype=torch.float).to(self.device)
+        print(f'Class weights: {self.class_weights}')
+
         # Set the seed for reproducibility
         self.__set_seed()
 
@@ -79,24 +86,26 @@ class Model():
                 # Get the loss value from the output, which is the cross-entropy loss
                 loss = outputs.loss
 
+                # Apply class weights to the loss
+                weighted_loss = loss * self.class_weights[labels].mean()
+
                 # Accumulate the training loss for the current batch
-                total_loss += loss.item()
+                total_loss += weighted_loss.item()
 
                 # Get the predicted labels (a tensor containing the raw, unnormalized scores output by the final layer of the neural network for each class: hired or rejected)
                 logits = outputs.logits
-                #_, preds = torch.max(logits, dim=1)
-                #correct_predictions += torch.sum(preds == labels)
-                correct_predictions += logits.argmax(dim=1).eq(labels).sum().item()
+                _, preds = torch.max(logits, dim=1)
+                correct_predictions += torch.sum(preds == labels)
 
-                loss.backward()
+                weighted_loss.backward()
                 optimizer.step()
                 scheduler.step()
 
                 # Update the progress bar with the current loss
-                progress_bar.set_postfix(loss=loss.item())
+                progress_bar.set_postfix(loss=weighted_loss.item())
 
             # Print the correct predictions
-            print(f'Correct predictions: {correct_predictions}')
+            print(f'Correct predictions: {correct_predictions.double()}')
 
             avg_train_loss = total_loss / len(self.train_data_loader)
             training_losses.append(avg_train_loss)
@@ -126,6 +135,16 @@ class Model():
         self.__save_model()
 
         print('Training completed')
+
+    def __get_class_distribution(self):
+        # Initialize counts for classes 0 and 1
+        class_counts = {0: 0, 1: 0} 
+        for batch in self.train_data_loader:
+            labels = batch['labels'].cpu().numpy()
+            for label in labels:
+                class_counts[label] += 1
+
+        return [class_counts[label] for label in sorted(class_counts.keys())]
 
     def __evaluate(self):
         # Set the model to evaluation model, disabling dropout and batch normalization layers
