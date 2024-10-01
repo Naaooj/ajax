@@ -1,7 +1,7 @@
+from common.json_utils import JsonUtils
+
+import matplotlib.pyplot as plt
 import os
-
-from src.common.json_utils import JsonUtils
-
 
 def analyze_text_lengths(folder):
     lengths = []
@@ -17,9 +17,6 @@ def analyze_text_lengths(folder):
 hired_lengths = analyze_text_lengths('resumes/results/hired/')
 rejected_lengths = analyze_text_lengths('resumes/results/rejected/')
 all_lengths = hired_lengths + rejected_lengths
-
-# Plot histogram
-import matplotlib.pyplot as plt
 
 plt.hist(all_lengths, bins=50, alpha=0.75)
 plt.xlabel('Text Length')
