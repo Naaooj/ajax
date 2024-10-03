@@ -4,13 +4,11 @@ from transformers import RobertaConfig, RobertaForSequenceClassification, get_li
 
 import datetime
 import matplotlib.pyplot as plt
-import numpy as np
 import os
-import random
 import torch
 
 class Model():
-    def __init__(self, train_data_loader, validation_data_loader, models_dir, num_epochs=5, learning_rate=2e-5, weight_decay=1e-2, patience=3, seed=42, accumulation_steps=4):
+    def __init__(self, train_data_loader, validation_data_loader, models_dir, num_epochs=5, learning_rate=2e-5, weight_decay=1e-2, patience=3):
         print('Initializing model...')
         self.train_data_loader = train_data_loader
         self.validation_data_loader = validation_data_loader
@@ -18,8 +16,6 @@ class Model():
         self.learning_rate = learning_rate
         self.weight_decay = weight_decay
         self.patience = patience
-        self.seed = seed
-        self.accumulation_steps = accumulation_steps
 
         config = RobertaConfig.from_pretrained('roberta-large', num_labels=1)
         self.model = RobertaForSequenceClassification.from_pretrained('roberta-large', config=config)
@@ -34,20 +30,6 @@ class Model():
         # Ensure the output directory exists
         os.makedirs(models_dir, exist_ok=True)
         self.models_dir = models_dir
-
-        # Calculate class weights
-        class_counts = self.__get_class_distribution()
-        total_samples = sum(class_counts)
-        print(f'Class counts: {class_counts}, total samples: {total_samples}')
-        class_weights = [total_samples / (class_count * 1.5) for class_count in class_counts]
-        self.class_weights = torch.tensor(class_weights, dtype=torch.float).to(self.device)
-        print(f'Class weights: {class_weights}, tensor class weight: {self.class_weights}')
-
-        # Define the loss function with class weights
-        self.loss_fn = torch.nn.BCEWithLogitsLoss(pos_weight=self.class_weights[1])
-
-        # Set the seed for reproducibility
-        self.__set_seed()
 
     def train_model(self):
         print('Starting the training of the model')
@@ -78,48 +60,35 @@ class Model():
             correct_predictions = 0
 
             progress_bar = tqdm(self.train_data_loader, desc=f'Epoch {epoch + 1}/{self.num_epochs}', leave=False)
-            optimizer.zero_grad() # Clear any previously calculated gradients before performing a backward pass
 
-            for step, batch in enumerate(progress_bar):
+            for batch in progress_bar:
                 input_ids = batch['input_ids'].to(self.device)
                 attention_mask = batch['attention_mask'].to(self.device)
-                labels = batch['labels'].to(self.device)
-                float_labels = labels.float().unsqueeze(1) # Ensure labels are float and have shape (batch_size, 1)
+                labels = batch['labels'].to(self.device).float()
 
                 # Clear any previously calculated gradients before performing a backward pass
-                #self.model.zero_grad()
+                self.model.zero_grad()
 
                 # Perform a forward pass through the model
                 outputs = self.model(input_ids=input_ids, attention_mask=attention_mask, labels=labels)
 
-                # Get the predicted labels (a tensor containing the raw, unnormalized scores output by the final layer of the neural network for each class: hired or rejected)
-                logits = outputs.logits.squeeze(-1) # Squeeze logits to maatch the labels shape when using BCEWithLogitsLoss
-
                 # Get the loss value from the output, which is the cross-entropy loss
-                loss = self.loss_fn(outputs.logits, float_labels)
-
-                # Apply class weights to the loss
-                weighted_loss = loss * self.class_weights[labels].mean()
-
-                # Normalize loss to account for gradient accumulation
-                weighted_loss = weighted_loss / self.accumulation_steps
+                loss = outputs.loss
 
                 # Accumulate the training loss for the current batch
-                total_loss += weighted_loss.item() * self.accumulation_steps # Multiply by accumulation steps for gradient accumulation
+                total_loss += loss.item()
 
                 # Use sigmoid and threshold to determine predicted class
-                preds = torch.round(torch.sigmoid(logits))
-                correct_predictions += torch.sum(preds == labels).item()
+                logits = outputs.logits
+                _, preds = torch.max(logits, dim=1)
+                correct_predictions += torch.sum(preds == labels)
 
-                weighted_loss.backward()
-
-                if (step + 1) % self.accumulation_steps == 0:
-                    optimizer.step()
-                    scheduler.step()
-                    optimizer.zero_grad()
+                loss.backward()
+                optimizer.step()
+                scheduler.step()
 
                 # Update the progress bar with the current loss
-                progress_bar.set_postfix(loss=weighted_loss.item() * self.accumulation_steps)
+                progress_bar.set_postfix(loss=loss.item())
 
             # Print the correct predictions
             print(f'Correct predictions: {correct_predictions}')
@@ -153,16 +122,6 @@ class Model():
 
         print('Training completed')
 
-    def __get_class_distribution(self):
-        # Initialize counts for classes 0 and 1
-        class_counts = {0: 0, 1: 0} 
-        for batch in self.train_data_loader:
-            labels = batch['labels'].cpu().numpy()
-            for label in labels:
-                class_counts[label] += 1
-
-        return [class_counts[label] for label in sorted(class_counts.keys())]
-
     def __evaluate(self):
         # Set the model to evaluation model, disabling dropout and batch normalization layers
         self.model.eval()
@@ -178,22 +137,19 @@ class Model():
             for batch in progress_bar:
                 input_ids = batch['input_ids'].to(self.device)
                 attention_mask = batch['attention_mask'].to(self.device)
-                labels = batch['labels'].to(self.device).float().unsqueeze(1) # Ensure labels are float and have shape (batch_size, 1)
+                labels = batch['labels'].to(self.device)
 
                 outputs = self.model(input_ids=input_ids, attention_mask=attention_mask, labels=labels)
-                logits = outputs.logits.squeeze(-1) # Squeeze logits to maatch the labels shape when using BCEWithLogitsLoss
-                loss = self.loss_fn(outputs.logits, labels)
+                loss = outputs.loss
                 total_loss += loss.item()
 
-                # Use sigmoid and threshold to determine predicted class
-                preds = torch.round(torch.sigmoid(logits))
-                predictions = torch.sum(preds == labels.squeeze(1)).item()
-                correct_predictions += predictions
+                logits = outputs.logits
+                _, preds = torch.max(logits, dim=1)
+                correct_predictions += torch.sum(preds == labels).item()
 
                 # Print the labels and predictions
-                print(f'Labels: {labels.squeeze(1)}')
+                print(f'Labels: {labels}')
                 print(f'Predictions: {preds}')
-                print(f'Predictions matching labels: {predictions}')
                 print(f'Total number of predictions: {correct_predictions}')
 
                 all_labels.extend(labels.cpu().numpy())
@@ -275,14 +231,3 @@ class Model():
         # Save the trained model to the given path
         self.model.save_pretrained(save_directory=self.models_dir, state_dict=self.model.state_dict())
         print(f'Model saved to directory {self.models_dir}')
-
-    def __set_seed(self):
-        random.seed(self.seed)
-        np.random.seed(self.seed)
-        torch.manual_seed(self.seed)
-        if torch.cuda.is_available():
-            torch.cuda.manual_seed_all(self.seed)
-
-        # Ensure deterministic behavior
-        torch.backends.cudnn.deterministic = True
-        torch.backends.cudnn.benchmark = False
