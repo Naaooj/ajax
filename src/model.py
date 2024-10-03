@@ -1,6 +1,6 @@
 from sklearn.metrics import precision_score, recall_score, f1_score
 from tqdm import tqdm
-from transformers import RobertaForSequenceClassification, get_linear_schedule_with_warmup
+from transformers import RobertaConfig, RobertaForSequenceClassification, get_linear_schedule_with_warmup
 
 import datetime
 import matplotlib.pyplot as plt
@@ -10,7 +10,7 @@ import random
 import torch
 
 class Model():
-    def __init__(self, train_data_loader, validation_data_loader, models_dir, num_epochs=5, learning_rate=2e-5, weight_decay=1e-2, patience=3, seed=42):
+    def __init__(self, train_data_loader, validation_data_loader, models_dir, num_epochs=5, learning_rate=2e-5, weight_decay=1e-2, patience=3, seed=42, accumulation_steps=4):
         print('Initializing model...')
         self.train_data_loader = train_data_loader
         self.validation_data_loader = validation_data_loader
@@ -19,7 +19,10 @@ class Model():
         self.weight_decay = weight_decay
         self.patience = patience
         self.seed = seed
-        self.model = RobertaForSequenceClassification.from_pretrained('roberta-large', num_labels=2)
+        self.accumulation_steps = accumulation_steps
+
+        config = RobertaConfig.from_pretrained('roberta-large', num_labels=1)
+        self.model = RobertaForSequenceClassification.from_pretrained('roberta-large', config=config)
 
         if torch.cuda.is_available():
             print('Model will be trained using GPU')
@@ -36,9 +39,12 @@ class Model():
         class_counts = self.__get_class_distribution()
         total_samples = sum(class_counts)
         print(f'Class counts: {class_counts}, total samples: {total_samples}')
-        class_weights = [total_samples / (class_count * 2) for class_count in class_counts]
+        class_weights = [total_samples / (class_count * 1.5) for class_count in class_counts]
         self.class_weights = torch.tensor(class_weights, dtype=torch.float).to(self.device)
         print(f'Class weights: {class_weights}, tensor class weight: {self.class_weights}')
+
+        # Define the loss function with class weights
+        self.loss_fn = torch.nn.BCEWithLogitsLoss(pos_weight=self.class_weights[1])
 
         # Set the seed for reproducibility
         self.__set_seed()
@@ -72,41 +78,51 @@ class Model():
             correct_predictions = 0
 
             progress_bar = tqdm(self.train_data_loader, desc=f'Epoch {epoch + 1}/{self.num_epochs}', leave=False)
+            optimizer.zero_grad() # Clear any previously calculated gradients before performing a backward pass
 
-            for batch in progress_bar:
+            for step, batch in enumerate(progress_bar):
                 input_ids = batch['input_ids'].to(self.device)
                 attention_mask = batch['attention_mask'].to(self.device)
                 labels = batch['labels'].to(self.device)
+                float_labels = labels.float().unsqueeze(1) # Ensure labels are float and have shape (batch_size, 1)
 
                 # Clear any previously calculated gradients before performing a backward pass
-                self.model.zero_grad()
+                #self.model.zero_grad()
 
                 # Perform a forward pass through the model
                 outputs = self.model(input_ids=input_ids, attention_mask=attention_mask, labels=labels)
 
+                # Get the predicted labels (a tensor containing the raw, unnormalized scores output by the final layer of the neural network for each class: hired or rejected)
+                logits = outputs.logits.squeeze(-1) # Squeeze logits to maatch the labels shape when using BCEWithLogitsLoss
+
                 # Get the loss value from the output, which is the cross-entropy loss
-                loss = outputs.loss
+                loss = self.loss_fn(outputs.logits, float_labels)
 
                 # Apply class weights to the loss
                 weighted_loss = loss * self.class_weights[labels].mean()
 
-                # Accumulate the training loss for the current batch
-                total_loss += weighted_loss.item()
+                # Normalize loss to account for gradient accumulation
+                weighted_loss = weighted_loss / self.accumulation_steps
 
-                # Get the predicted labels (a tensor containing the raw, unnormalized scores output by the final layer of the neural network for each class: hired or rejected)
-                logits = outputs.logits
-                _, preds = torch.max(logits, dim=1)
-                correct_predictions += torch.sum(preds == labels)
+                # Accumulate the training loss for the current batch
+                total_loss += weighted_loss.item() * self.accumulation_steps # Multiply by accumulation steps for gradient accumulation
+
+                # Use sigmoid and threshold to determine predicted class
+                preds = torch.round(torch.sigmoid(logits))
+                correct_predictions += torch.sum(preds == labels).item()
 
                 weighted_loss.backward()
-                optimizer.step()
-                scheduler.step()
+
+                if (step + 1) % self.accumulation_steps == 0:
+                    optimizer.step()
+                    scheduler.step()
+                    optimizer.zero_grad()
 
                 # Update the progress bar with the current loss
-                progress_bar.set_postfix(loss=weighted_loss.item())
+                progress_bar.set_postfix(loss=weighted_loss.item() * self.accumulation_steps)
 
             # Print the correct predictions
-            print(f'Correct predictions: {correct_predictions.double()}')
+            print(f'Correct predictions: {correct_predictions}')
 
             avg_train_loss = total_loss / len(self.train_data_loader)
             training_losses.append(avg_train_loss)
@@ -115,7 +131,7 @@ class Model():
             print(f'Evaluating epoch {epoch + 1}')
             val_loss, val_accuracy, val_precision, val_recall, val_f1 = self.__evaluate()
             validation_losses.append(val_loss)
-            validation_accuracies.append(val_accuracy.cpu().numpy())
+            validation_accuracies.append(val_accuracy)
             validation_precisions.append(val_precision)
             validation_recalls.append(val_recall)
             validation_f1s.append(val_f1)
@@ -162,22 +178,23 @@ class Model():
             for batch in progress_bar:
                 input_ids = batch['input_ids'].to(self.device)
                 attention_mask = batch['attention_mask'].to(self.device)
-                labels = batch['labels'].to(self.device)
+                labels = batch['labels'].to(self.device).float().unsqueeze(1) # Ensure labels are float and have shape (batch_size, 1)
 
                 outputs = self.model(input_ids=input_ids, attention_mask=attention_mask, labels=labels)
-                loss = outputs.loss
+                logits = outputs.logits.squeeze(-1) # Squeeze logits to maatch the labels shape when using BCEWithLogitsLoss
+                loss = self.loss_fn(outputs.logits, labels)
                 total_loss += loss.item()
 
-                logits = outputs.logits
-                _, preds = torch.max(logits, dim=1)
-                predictions = torch.sum(preds == labels)
+                # Use sigmoid and threshold to determine predicted class
+                preds = torch.round(torch.sigmoid(logits))
+                predictions = torch.sum(preds == labels.squeeze(1)).item()
                 correct_predictions += predictions
 
                 # Print the labels and predictions
-                print(f'Labels: {labels}')
+                print(f'Labels: {labels.squeeze(1)}')
                 print(f'Predictions: {preds}')
-                print(f'Predictions: {predictions}')
-                print(f'Correct predictions: {correct_predictions}')
+                print(f'Predictions matching labels: {predictions}')
+                print(f'Total number of predictions: {correct_predictions}')
 
                 all_labels.extend(labels.cpu().numpy())
                 all_preds.extend(preds.cpu().numpy())
@@ -186,7 +203,7 @@ class Model():
                 progress_bar.set_postfix(loss=loss.item())
 
         avg_loss = total_loss / len(self.validation_data_loader)
-        accuracy = correct_predictions.double() / len(self.validation_data_loader.dataset)
+        accuracy = correct_predictions / len(self.validation_data_loader.dataset)
         precision = precision_score(all_labels, all_preds, average='macro', zero_division=0)
         recall = recall_score(all_labels, all_preds, average='macro', zero_division=0)
         f1 = f1_score(all_labels, all_preds, average='macro', zero_division=0)
