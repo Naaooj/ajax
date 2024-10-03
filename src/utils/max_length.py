@@ -1,4 +1,4 @@
-from common.json_utils import JsonUtils
+from src.common.json_utils import JsonUtils
 
 import matplotlib.pyplot as plt
 import os
@@ -21,5 +21,5 @@ all_lengths = hired_lengths + rejected_lengths
 plt.hist(all_lengths, bins=50, alpha=0.75)
 plt.xlabel('Text Length')
 plt.ylabel('Frequency')
-plt.title('Distribution of Resume Text Lengths')
+plt.title('Distribution of resume text lengths')
 plt.show()

@@ -2,7 +2,6 @@ import os
 
 from src.dataset_builder.dataset_folder_converter import DatasetFolderConverter
 
-
 class DatasetBuilder:
 
     def __init__(self, override):

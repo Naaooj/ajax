@@ -1,5 +1,5 @@
 from model import Model
-from resume_dataset_builder import ResumeDatasetBuilder
+from src.model_training.resume_dataset_builder import ResumeDatasetBuilder
 from torch.utils.data import DataLoader, random_split
 from transformers import AutoTokenizer
 

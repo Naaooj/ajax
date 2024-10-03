@@ -1,5 +1,5 @@
-from resume_dataset import ResumeDataset
-from common.json_utils import JsonUtils
+from src.common.json_utils import JsonUtils
+from src.model_training.resume_dataset import ResumeDataset
 
 import os
 
