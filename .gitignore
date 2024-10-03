@@ -1,6 +1,7 @@
 uploads
 venv
 .idea
+.vscode
 resumes
 ajax
 output.json
