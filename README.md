@@ -48,11 +48,11 @@ Please note that every time you want to run the project you need to activate the
 ### Creating the dataset
 See [the corresponding documentation](src/dataset_builder/README.md)
 
-### Training the model
-See [the corresponding documentation](src/model_training/README.md)
+### Training the model
+See [the corresponding documentation](src/model_training/README.md)  
 
-### Utils
-See [the corresponding documentation](src/utils/README.md)
+### Utils  
+See [the corresponding documentation](src/utils/README.md)  
 
 ## Configuring the VM for faster training with NVIDIA GPU
 Make sure the OS is up to date:
