@@ -1,5 +1,16 @@
 # AJAX
 
+The AJAX project is a proof of concept aims to build a machine learning model to classify resumes into two categories: "hired" and "rejected".  
+The primary goal is to automate the resume screening process, helping recruiters quickly identify potential candidates.
+
+The project involves the following key components:
+
+1. Data Collection: Resumes are collected and stored in JSON format in two separate folders: one for hired candidates and one for rejected candidates.
+2. Model Training: A machine learning model is trained using the dataset to classify resumes based on the text content.
+3. Evaluation: The model's performance is evaluated using various metrics such as accuracy, precision, recall, and F1 score.
+
+The project leverages the power of natural language processing (NLP) and deep learning to streamline the recruitment process, making it more efficient and effective.
+
 ## Getting started
 
 1. Create a virtual environment, this allows to manage dependencies for the project without affecting the system's python installation.
@@ -21,27 +32,6 @@
    ```
    pip install torch openai azure-cognitiveservices-vision-computervision transformers pillow fitz image tqdm scikit-learn matplotlib
    ```
-
-5. Create a config.ini
-   In the `src/common` directory, create a `config.ini` in order to configure the keys, models, and api of Azure to use.
-   The file should have the following content:
-   ```
-   [openai]
-   key = your_api_key
-   endpoint = your_azure_openai_endpoint
-   deployment_name = your_deployment_name
-   api_version = your_api_version
-   ```
-   Those information should NEVER be stored in git. 
-
-6. Create a folder `src/resumes`
-   ```
-   resumes/
-   ├─hired
-   ├─rejected
-   ```
-   And put PDF files of valid or unvalid resumes accordingly
-   This folder should NEVER be stored in git.
 
 Please note that every time you want to run the project you need to activate the virtual environment and reference the python path.
 
