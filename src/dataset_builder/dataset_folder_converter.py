@@ -2,8 +2,7 @@ import json
 import os
 import time
 
-from src.common.azure_service import AzureService
-from src.dataset_builder.pdf_reader import PDFReader
+from src.common.pdf_convertion import convert_pdf_to_json
 
 
 class DatasetFolderConverter:
@@ -33,22 +32,8 @@ class DatasetFolderConverter:
             print("Already converted and will be ignored.")
             return
 
-        # Create the PDFReader object, and get the images
-        pdf_reader = PDFReader(pdf_path)
-        images = pdf_reader.get_images()
-        if len(images) > 10:
-            print("CV has more than 10 pages. Only the first 10 pages will be converted.")
-            images = images[:10]
-
-        # Create the AzureService object and call the Vision API
-        azure_service = AzureService()
-        response = azure_service.call_vision_api(images)
-
-        # Get the JSON response from the API (as requested in the prompt)
         try:
-            response = azure_service.call_vision_api(images)
-            json_response = response.choices[0].message.content
-            json_response = json.loads(json_response)
+            json_response = convert_pdf_to_json(pdf_path)
         except Exception as e:
             print("Cannot get JSON. IGNORED. File is removed.", e)
             os.remove(pdf_path)

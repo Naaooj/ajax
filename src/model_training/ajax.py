@@ -21,7 +21,7 @@ def main():
     validation_data_loader = DataLoader(validation_dataset, batch_size=validation_batch_size, shuffle=False)
     
     # Define the directory to save the models    
-    models_dir = os.path.join(os.getcwd(), 'models')
+    models_dir = os.path.join(os.getcwd(), '../models')
 
     # Train the model
     model = Model(train_data_loader, validation_data_loader, models_dir, num_epochs=5, learning_rate=1e-5, weight_decay=1e-2, patience=3)

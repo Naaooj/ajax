@@ -2,13 +2,15 @@ import os
 import torch
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
+from src.common.json_utils import JsonUtils
+
 
 class ModelClassifier:
-
     def __init__(self):
         # Use a pre-trained tokenizer that matches your model type
+        model_dir = os.path.join(os.getcwd(), 'models/')
         self.tokenizer = AutoTokenizer.from_pretrained('roberta-large')
-        self.model = AutoModelForSequenceClassification.from_pretrained(os.path.join(os.getcwd(), 'models/'))
+        self.model = AutoModelForSequenceClassification.from_pretrained(model_dir)
         self.max_length = 128
         self.model.eval()
 
@@ -49,8 +51,6 @@ class ModelClassifier:
 #
 #
 # if __name__ == '__main__':
-#     model_dir = os.path.join(os.getcwd(), 'models/')
-#     max_length = 128
-#     classifier = ModelClassifier(model_dir, max_length)
+#     classifier = ModelClassifier()
 #     classify_folder(os.path.join(os.getcwd(), 'resumes/results/hired/'))
 #     classify_folder(os.path.join(os.getcwd(), 'resumes/results/rejected/'))
