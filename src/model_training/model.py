@@ -1,6 +1,6 @@
 from sklearn.metrics import precision_score, recall_score, f1_score
 from tqdm import tqdm
-from transformers import RobertaConfig, RobertaForSequenceClassification, get_linear_schedule_with_warmup
+from transformers import BertForSequenceClassification, get_linear_schedule_with_warmup
 
 import datetime
 import matplotlib.pyplot as plt
@@ -17,8 +17,7 @@ class Model():
         self.weight_decay = weight_decay
         self.patience = patience
 
-        config = RobertaConfig.from_pretrained('roberta-large', num_labels=1)
-        self.model = RobertaForSequenceClassification.from_pretrained('roberta-large', config=config)
+        self.model = BertForSequenceClassification.from_pretrained('bert-base-uncased', num_labels=2)
 
         if torch.cuda.is_available():
             print('Model will be trained using GPU')
@@ -64,7 +63,7 @@ class Model():
             for batch in progress_bar:
                 input_ids = batch['input_ids'].to(self.device)
                 attention_mask = batch['attention_mask'].to(self.device)
-                labels = batch['labels'].to(self.device).float()
+                labels = batch['labels'].to(self.device)
 
                 # Clear any previously calculated gradients before performing a backward pass
                 self.model.zero_grad()

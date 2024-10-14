@@ -8,10 +8,11 @@ class DatasetBuilder:
         self.override = override
 
     def run(self):
-        hired_folder_path = os.path.join(os.getcwd(), '../resumes/hired/')
-        rejected_folder_path = os.path.join(os.getcwd(), '../resumes/rejected/')
-        hired_results_folder_path = os.path.join(os.getcwd(), '../resumes/results/hired/')
-        rejected_results_folder_path = os.path.join(os.getcwd(), '../resumes/results/rejected/')
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        hired_folder_path = os.path.join(current_dir, '../resumes/hired/')
+        rejected_folder_path = os.path.join(current_dir, '../resumes/rejected/')
+        hired_results_folder_path = os.path.join(current_dir, '../resumes/results/hired/')
+        rejected_results_folder_path = os.path.join(current_dir, '../resumes/results/rejected/')
 
         hired_pdf_converter = DatasetFolderConverter(hired_folder_path, hired_results_folder_path, self.override)
         rejected_pdf_converter = DatasetFolderConverter(rejected_folder_path, rejected_results_folder_path, self.override)
