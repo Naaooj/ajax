@@ -19,7 +19,7 @@ class AzureService:
         """
         # Load configuration from config.ini
         self.__config = configparser.ConfigParser()
-        config_path = os.path.join(os.path.dirname(__file__), 'config.ini')
+        config_path = os.path.join(os.path.dirname(__file__), '../config.ini')
         self.__config.read(config_path)
 
         # Create an OpenAI client

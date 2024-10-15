@@ -1,3 +1,4 @@
+import json
 import os
 
 from flask import Flask, render_template, request, redirect
@@ -32,10 +33,11 @@ def upload_file():
 
     # check if the file is allowed
     if file and allowed_file(file.filename):
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
+        filepath = os.path.join(os.getcwd(), app.config['UPLOAD_FOLDER'], file.filename)
         file.save(filepath)
         resume_in_json = convert_pdf_to_json(filepath)
-        resume_classification = ModelClassifier().classify(resume_in_json)
+        resume_text = json.dumps(resume_in_json)
+        resume_classification = ModelClassifier().classify(resume_text)
         return "Candidate should be called in priority" if resume_classification == 1 else "Candidate should be called in normal order"
     else:
         return 'File type not allowed'
