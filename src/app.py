@@ -4,6 +4,7 @@ import os
 from flask import Flask, render_template, request, redirect
 
 from src.classifier.classifier import ModelClassifier
+from src.common.json_utils import JsonUtils
 from src.common.pdf_convertion import convert_pdf_to_json
 
 app = Flask(__name__)
@@ -36,7 +37,7 @@ def upload_file():
         filepath = os.path.join(os.getcwd(), app.config['UPLOAD_FOLDER'], file.filename)
         file.save(filepath)
         resume_in_json = convert_pdf_to_json(filepath)
-        resume_text = json.dumps(resume_in_json)
+        resume_text = JsonUtils.flatten_content(resume_in_json) # json.dumps(resume_in_json)
         resume_classification = ModelClassifier().classify(resume_text)
         return "Candidate should be called in priority" if resume_classification == 1 else "Candidate should be called in normal order"
     else:
