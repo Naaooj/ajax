@@ -1,10 +1,5 @@
 
-
 document.getElementById('file').addEventListener('change', function() {
-    var uploadButton = document.getElementById('uploadButton');
-    if (this.files.length > 0) {
-        uploadButton.disabled = false;
-    } else {
-        uploadButton.disabled = true;
-    }
+    const uploadButton = document.getElementById('uploadButton');
+    uploadButton.disabled = this.files.length === 0;
 });

@@ -1,24 +1,23 @@
-/* static/styles.css */
 body {
     background-color: lightgray;
     font-family: Arial, sans-serif;
     text-align: center;
-    height: 100vh; : Définit la hauteur du corps à 100% de la hauteur de la fenêtre.
+    height: 100vh;
 }
 
 .container {
     width: 100%;
-    max-width: 2000px; /* Limite la largeur maximale du conteneur */
+    max-width: 2000px;
     background-color: white;
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    overflow: hidden; /* Assure que le contenu ne déborde pas */
+    overflow: hidden;
     height: 100%;
 }
 
 .banner > img {
     width: 100%;
-    max-width: 2000px; /* Limite la largeur maximale de l'image */
+    max-width: 2000px;
 
 }
 
@@ -26,8 +25,8 @@ body {
     height: 150px;
     background-image: var(--banner-url);
     background-position: bottom right;
-    background-repeat: no-repeat; /* Prevents the image from repeating */
-    background-size: cover; /* Ensures the image covers the entire element */
+    background-repeat: no-repeat;
+    background-size: cover;
     align-items: center;
     padding-top: 70px;
 }
