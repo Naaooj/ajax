@@ -38,8 +38,8 @@ def upload_file():
         file.save(filepath)
         resume_in_json = convert_pdf_to_json(filepath)
         resume_text = JsonUtils.flatten_content(resume_in_json) # json.dumps(resume_in_json)
-        resume_classification = ModelClassifier().classify(resume_text)
-        return "Candidate should be called in priority" if resume_classification == 1 else "Candidate should be called in normal order"
+        result = ModelClassifier().classify(resume_text)
+        return "High priority candidate" if result == 1 else "No priority detected"
     else:
         return 'File type not allowed'
 
