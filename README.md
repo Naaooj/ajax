@@ -30,7 +30,7 @@ The project leverages the power of natural language processing (NLP) and deep le
 
 4. Install the required packages
    ```
-   pip install torch openai azure-cognitiveservices-vision-computervision transformers pillow fitz image tqdm scikit-learn matplotlib Flask
+   pip install torch openai azure-cognitiveservices-vision-computervision transformers pillow fitz PyMuPDF image tqdm scikit-learn matplotlib Flask
    ```
 
 Please note that every time you want to run the project you need to activate the virtual environment and reference the python path.
