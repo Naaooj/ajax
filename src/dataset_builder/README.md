@@ -13,7 +13,7 @@ To build the dataset, you need to have `resumes` folder in the `src` directory. 
    And put PDF files of valid or unvalid resumes accordingly
    This folder should NEVER be stored in git.
 
-All PDF resumes in these folders will be converted into images and sent to the [Azure OpenAI Service](https://learn.microsoft.com/en-us/azure/ai-services/openai/) with [GPT-4 Turbo with Vision](https://learn.microsoft.com/en-us/azure/ai-services/openai/gpt-v-quickstart) API to extract the relevant data regarding Pictet Technologies recrutment criterias. Azure service can't be called without authentication, to configure it, you have to create a `config.ini` file, in the `src/common` directory.
+All PDF resumes in these folders will be converted into images and sent to the [Azure OpenAI Service](https://learn.microsoft.com/en-us/azure/ai-services/openai/) with [GPT-4 Turbo with Vision](https://learn.microsoft.com/en-us/azure/ai-services/openai/gpt-v-quickstart) API to extract the relevant data regarding some recrutment criterias. Azure service can't be called without authentication, to configure it, you have to create a `config.ini` file, in the `src/common` directory.
 
 1. Create a `config.ini`
    ```
