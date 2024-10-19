@@ -4,7 +4,6 @@ from PIL import Image
 import base64
 import fitz
 
-
 class PDFReader:
 
     def __init__(self, pdf_path):

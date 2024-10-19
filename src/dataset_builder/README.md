@@ -1,4 +1,4 @@
-# AJAX dataset builder
+# TindHire dataset builder
 
 ## How the dataset is built
 

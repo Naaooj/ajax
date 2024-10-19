@@ -1,6 +1,6 @@
-# AJAX
+# TindHire
 
-The AJAX project is a proof of concept aims to build a machine learning model to classify resumes into two categories: "hired" and "rejected".  
+The TindHire project is a proof of concept aims to build a machine learning model to classify resumes into two categories: "hired" and "rejected".  
 The primary goal is to automate the resume screening process, helping recruiters quickly identify potential candidates.
 
 The project involves the following key components:
@@ -15,12 +15,12 @@ The project leverages the power of natural language processing (NLP) and deep le
 
 1. Create a virtual environment, this allows to manage dependencies for the project without affecting the system's python installation.
    ```
-   python3 -m venv ajax
+   python3 -m venv tindhire
    ```
 
 2. Activate the virtual environment
    ```
-   source ajax/bin/activate
+   source tindhire/bin/activate
    ```
 
 3. Reference the root project as PYTHONPATH

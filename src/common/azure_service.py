@@ -4,7 +4,6 @@ import src.common.constants as cs
 import configparser
 import os
 
-
 class AzureService:
     """
     The AzureService class is responsible for calling the OpenAI Vision API to extract data from the images.

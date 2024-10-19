@@ -1,4 +1,4 @@
-# AJAX Utils
+# TindHire Utils
 
 ## Max length
 

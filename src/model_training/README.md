@@ -1,1 +1,1 @@
-# AJAX Model training
+# TindHire Model training

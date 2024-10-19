@@ -1,4 +1,4 @@
-# AJAX classifier
+# TindHire classifier
 
 ## How the classifier works
 

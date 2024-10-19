@@ -4,6 +4,7 @@ venv
 .vscode
 resumes
 ajax
+tindhire
 output.json
 config.ini
 models

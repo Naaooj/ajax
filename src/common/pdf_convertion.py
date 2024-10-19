@@ -3,7 +3,6 @@ import json
 from src.common.azure_service import AzureService
 from src.dataset_builder.pdf_reader import PDFReader
 
-
 def convert_pdf_to_json(pdf_path):
 
     # Create the PDFReader object, and get the images
