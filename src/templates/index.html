@@ -16,21 +16,33 @@
 
 <body>
     <div class="container">
-      <div class="banner">
+        <div class="banner">
           <h1>Welcome to TindHire!</h1>
           <h2>AI-Powered CV Prioritization: Hire the best, first!</h2>
-        <!--<img src="{{ url_for('static', filename='banner.png') }}" alt="banner Image">-->
+        </div>
     </div>
+
     <div class="content">
+        <p>
+            <h4>Find your best profile here in 3 steps.</h4><br/>
+        </p>
 
-    <p> Find your best profile here.<br>Select the CV to screen<br></p>
+        <div class="step-container">
+            <p class="steps">
+            Step 1: Select the CV to screen. Click on choose file.<br/>
+            Step 2: Click on upload CV.<br/>
+            Step 3: Get the best profile.<br/>
+                <br/>
+                <br/>
+             </p>
+        </div>
 
-    <h3>Upload Your CV</h3>
-    <form method="post" action="/upload" enctype="multipart/form-data">
-        <input type="file" name="file" id="file">
-        <button type="submit" id="uploadButton" disabled>Upload CV</button>
-    </form>
-<script src="{{ url_for('static', filename='script.js') }}"></script>
-
+        <h3>Upload your CV and see the result.</h3>
+        <form method="post" action="/upload" enctype="multipart/form-data">
+            <input type="file" name="file" id="file">
+            <button type="submit" id="uploadButton" disabled>Upload CV</button>
+        </form>
+        <script src="{{ url_for('static', filename='script.js') }}"></script>
+    </div>
 </body>
 </html>

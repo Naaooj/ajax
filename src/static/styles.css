@@ -12,7 +12,12 @@ body {
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     overflow: hidden;
-    height: 100%;
+}
+
+.step-container {
+    text-align: left;
+    size: 300px;
+    margin 0;
 }
 
 .banner > img {
@@ -28,11 +33,12 @@ body {
     background-repeat: no-repeat;
     background-size: cover;
     align-items: center;
-    padding-top: 70px;
+    padding-top: 30px;
+    padding-bottom: 30px;
 }
 
 .content {
-    padding: 100px;
+    padding: 70px;
     background-color: white;
 }
 
@@ -48,6 +54,10 @@ h2 {
 
 h3 {
     color: blue;
+}
+
+h4 {
+    font-size: 25px;
 }
 
 .file-input {
@@ -78,3 +88,8 @@ button {
 button:disabled {
     background-color: lightgray;
  }
+
+.steps {
+    text-align: left;
+    margin-left: 350px;
+}
