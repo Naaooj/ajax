@@ -34,6 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             loaderContainer.style.display = 'none';
+            uploadButton.disabled = true;
             messageDiv.textContent = data.message;
         })
         .catch(error => {
