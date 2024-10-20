@@ -2,7 +2,7 @@ uploads
 venv
 .idea
 .vscode
-resumes
+src/resumes
 ajax
 tindhire
 output.json

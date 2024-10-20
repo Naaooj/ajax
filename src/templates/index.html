@@ -5,21 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TindHire</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
          :root {
             --banner-url: url("{{ url_for('static', filename='banner.png') }}");
         }
 
         :root {
             --banner-url: url("{{ url_for('static', filename='img_4.png') }}");
-        }
-
-         <style>
-        /* Include the CSS here or in an external stylesheet */
-        .text-with-halo {
-            font-size: 2em;
-            color: white;
-            text-shadow:
-                0 0 10px white,
         }
     </style>
 
@@ -32,14 +24,17 @@
 <body>
     <div class="container">
         <div class="banner">
-          <h1>Welcome to TindHire!</h1>
-          <h2>AI-Powered CV Prioritization: Hire the best, first!</h2>
         </div>
     </div>
 
     <div class="content">
         <p>
-            <h4>Find your best profile here in 3 steps.</h4><br/>
+            <!--<div class="banner text-with-halo">-->
+                <h1>Welcome to TindHire!</h1>
+                <h2>AI-Powered CV Prioritization: Hire the best, first!</h2>
+             <br/>
+
+                <h4>Find your best profile here in 3 steps.</h4>
         </p>
 
         <div class="step-container">
@@ -52,7 +47,6 @@
              </p>
         </div>
 
-        <h3>Upload your CV and see the result.</h3>
         <form method="post" action="/upload" enctype="multipart/form-data" id="uploadForm">
             <input type="file" name="file" id="file">
             <button type="submit" id="uploadButton" disabled>Upload CV</button>

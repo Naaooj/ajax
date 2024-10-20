@@ -9,7 +9,8 @@ class ModelClassifier:
     def __init__(self):
         # Use a pre-trained tokenizer that matches your model type
         self.tokenizer = AutoTokenizer.from_pretrained('bert-base-uncased')
-        self.model = AutoModelForSequenceClassification.from_pretrained(os.path.join(os.getcwd(), 'models/'))
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        self.model = AutoModelForSequenceClassification.from_pretrained(os.path.join(current_dir, '../models/'))
         self.max_length = 128
         self.model.eval()
 

@@ -14,7 +14,7 @@ def main():
     validation_size = len(dataset) - train_size
     train_dataset, validation_dataset = random_split(dataset, [train_size, validation_size])
 
-    train_batch_size = 16
+    train_batch_size = 32
     validation_batch_size = 8
 
     train_data_loader = DataLoader(train_dataset, batch_size=train_batch_size, shuffle=True)
@@ -25,7 +25,7 @@ def main():
     models_dir = os.path.join(current_dir, '../models')
 
     # Train the model
-    model = Model(train_data_loader, validation_data_loader, models_dir, num_epochs=5, learning_rate=1e-5, weight_decay=1e-2, patience=3)
+    model = Model(train_data_loader, validation_data_loader, models_dir, num_epochs=8, learning_rate=1e-3, weight_decay=1e-5, patience=3)
     model.train_model()
 
 if __name__ == '__main__':
