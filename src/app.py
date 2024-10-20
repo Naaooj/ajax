@@ -1,4 +1,3 @@
-import json
 import os
 
 from flask import Flask, render_template, request, redirect, jsonify
@@ -36,7 +35,7 @@ def upload_file():
         filepath = os.path.join(current_dir, app.config['UPLOAD_FOLDER'], file.filename)
         file.save(filepath)
         resume_in_json = convert_pdf_to_json(filepath)
-        resume_text = JsonUtils.flatten_content(resume_in_json) # json.dumps(resume_in_json)
+        resume_text = JsonUtils.flatten_content(resume_in_json)
         result = ModelClassifier().classify(resume_text)
 
         message = "High priority candidate" if result == 1 else "No priority detected"
@@ -45,4 +44,4 @@ def upload_file():
         return jsonify({'message': 'File type not allowed'}), 400
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=80, debug=True)
