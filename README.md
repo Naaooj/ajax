@@ -1,15 +1,23 @@
 # TindHire
 
+<p>
+<img src="src/static/tindhire-logo-icon.png" align="left" width="80px" />
 The TindHire project is a proof of concept aims to build a machine learning model to classify resumes into two categories: "hired" and "rejected".  
-The primary goal is to automate the resume screening process, helping recruiters quickly identify potential candidates.
-
+The primary goal is to automate the resume screening process, helping recruiters quickly identify potential candidates.  
+<br clear="left">
+</p>
+  
+<p>
 The project involves the following key components:
 
 1. Data Collection: Resumes are collected and stored in JSON format in two separate folders: one for hired candidates and one for rejected candidates.
 2. Model Training: A machine learning model is trained using the dataset to classify resumes based on the text content.
 3. Evaluation: The model's performance is evaluated using various metrics such as accuracy, precision, recall, and F1 score.
+</p>
 
+<p>
 The project leverages the power of natural language processing (NLP) and deep learning to streamline the recruitment process, making it more efficient and effective.
+</p>
 
 ## Getting started
 
