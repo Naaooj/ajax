@@ -49,6 +49,9 @@ See [the corresponding documentation](src/dataset_builder/README.md)
 ### Training the model
 See [the corresponding documentation](src/model_training/README.md)  
 
+### Running the web application
+See [the corresponding documentation](src/README.md)  
+
 ### Utils  
 See [the corresponding documentation](src/utils/README.md)  
 
